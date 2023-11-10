@@ -6,6 +6,7 @@ const catchAsync = require("../utils/catchAsync");
 const crypto = require("crypto");
 //const sendEmail = require("./../utils/email");
 const { getAsBool } = require("../utils/helpers");
+
 // const CreatedByHandler = (req, res, next) => {
 //   req.body.created_by = req.user.id
 //   next();
@@ -13,6 +14,10 @@ const { getAsBool } = require("../utils/helpers");
 // const CreatedByHandler =  catchAsync(async (req, res, next) => {
 //   next();
 // })
+
+const ADMIN_EMAIL = "admin@example.com"; // Replace with your admin email
+const ADMIN_PASSWORD = "adminPassword"; // Replace with your admin password
+
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -323,7 +328,30 @@ const deleteTechinician = async (req, res) => {
   }
 };
 
+const createSendTokenAdmin = (statusCode, res) => {
+  // Generate a JWT token for the admin
+  const token = signToken(1); // You can set the admin's user ID here
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+  });
+};
+
+const loginAdmin = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Check if the provided credentials match the hardcoded admin credentials
+  if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+    return next(new AppError("Incorrect email or password", 401));
+  }
+
+  // Send a JWT token to the admin
+  createSendTokenAdmin(200, res);
+});
+
 module.exports = {
+  loginAdmin,
   getAllUsers,
   registerUser,
   googleLogin,

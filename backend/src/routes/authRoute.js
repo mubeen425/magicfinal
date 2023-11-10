@@ -11,6 +11,7 @@ const {
   resetPasswordBackend,
   googleLogin,
   getAllUsers,
+  loginAdmin,
 } = require("../controllers/authController");
 const requireAuth = require("../middlewares/requireAuth");
 const restrictTo = require("../middlewares/restrictTo");
@@ -29,6 +30,7 @@ router.post(
   validateRequiredFields(["identifier", "password"]),
   loginUser
 );
+router.post("/admin/login", loginAdmin);
 router.get("/user-info", requireAuth, getUser);
 router.post("/google", googleLogin);
 router.get("/users", getAllUsers);
